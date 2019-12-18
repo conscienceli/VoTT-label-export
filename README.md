@@ -55,7 +55,9 @@ Run the following commands.
 The script will create three folders in the output path, i.e., "vis" storing the masks, "vis_with_raw" storing the raw frames with label masks, and "tensors" having the pickle files which can be used to load the category value for each pixel.
 
 File structures are as follows.
+
 ![File structure](./readme-files/files.jpg)
+
 Files are given the same name as the screenshots from VoTT, i.e., "video_name#timestamp.jpg"
 
 Generated masks:
