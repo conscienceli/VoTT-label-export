@@ -46,5 +46,21 @@
 * Then we can get a folder named "vott-json-export" in the "label" directory, including all labelling information in the JSON file and all the screenshots of the corresponding frames.
 
 
-### 2. Guidance for Using this script
-To be continued...
+### 2. Guidance for Using the Script
+
+Run the following commands.
+`python generate.py -i 'Project-1-export.json' -o './results/'`
+`-i` is to specify the json file and `-o` to specify the output path.
+
+The script will create three folders in the output path, i.e., "vis" storing the masks, "vis_with_raw" storing the raw frames with label masks, and "tensors" having the pickle files which can be used to load the category value for each pixel.
+
+File structures are as follows.
+![File structure](./readme-files/files.jpg)
+Files are given the same name as the screenshots from VoTT, i.e., "video_name#timestamp.jpg"
+
+Generated masks:
+* vis_with_raw
+![vis_with_raw](./readme-files/vis_with_raw.png)
+
+* vis
+![vis](./readme-files/vis.png)
