@@ -1,5 +1,7 @@
 # VoTT-label-export
  Scripts and guidance to export VoTT label of video semantic segmentation
+ 
+ [日本語](https://github.com/conscienceli/VoTT-label-export/blob/master/README_jp.md)
 
  VoTT is an open source annotation and labeling tool for image and video assets proposed by Micorsoft. It is hosted on https://github.com/microsoft/VoTT.
 
