@@ -4,6 +4,7 @@ import utils
 import numpy as np
 from joblib import Parallel, delayed
 import os
+from tqdm import tqdm
 
 # define the program description
 des_text = 'Please use -i to specify the json file and -o to specify the output path.'
@@ -94,6 +95,6 @@ print('\nDesired frames: ', len(desired_frames))
 os.makedirs(f'{output_path}vis', exist_ok=True)
 os.makedirs(f'{output_path}vis_with_raw', exist_ok=True)
 os.makedirs(f'{output_path}tensors', exist_ok=True)
-Parallel(n_jobs=16)(delayed(utils.generate_labels)\
+Parallel(n_jobs=8)(delayed(utils.generate_labels)\
                 (assets[asset_id], input_path, output_path, desired_frames, tags, tags_color)\
-                 for asset_id in assets.keys())
+                 for asset_id in tqdm(assets.keys()))

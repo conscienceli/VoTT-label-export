@@ -77,7 +77,10 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         curr_point = region['points'][0]
         draw.line((pre_point['x'], pre_point['y'], curr_point['x'], curr_point['y']), fill=1)
         del draw
-        ImageDraw.floodfill(flood_region, xy=find_inner_point(flood_region), value=1)
+        inner_point = find_inner_point(flood_region)
+        while inner_point:
+            ImageDraw.floodfill(flood_region, xy=inner_point, value=1)
+            inner_point = find_inner_point(flood_region)
         
         region_color = ImageColor.getrgb(tags_color[region['tags'][0]])
         
