@@ -9,10 +9,12 @@ def find_inner_point(image):
         for col_id, element in enumerate(row):
             if element and not image[row_id][col_id-1]:
                 edge_point_count += 1
-                if edge_point_count == 2 and not image[row_id][col_id-1]:
+                if edge_point_count == 2:
                     return (col_id-1, row_id)
                 elif edge_point_count > 2:
                     break
+            elif element and edge_point_count:
+                break
     return None
 
 
@@ -59,6 +61,10 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     regions = record['regions']
     if not asset['timestamp'] in desired_frames:
         return
+
+    # For debug
+    # if asset['name'].find('575.5') < 0:
+    #     return
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
 
