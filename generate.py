@@ -41,7 +41,7 @@ for tag in tags:
     tags_color.update({tag['name']: tag['color']})
 assets = json_file['assets']
 
-print('\nTotal assets:', len(assets.keys()))
+print('\nTotal frames:', len(assets.keys()))
 
 labelled = []
 negatives = []
@@ -68,11 +68,21 @@ for asset_id in assets.keys():
         if len(regions) == 0:
             removed_asset_id.append(asset_id)
         else:
-            for region in regions:
+            added_regions = []
+            removed_region_id = []
+            for region_id, region in enumerate(regions):
                 if not len(region['tags']) == 1:
-                    removed_asset_id.append(asset_id)
-                    break
-    
+                    removed_region_id.append(region_id)
+                    for tag_id in range(0, len(region['tags'])):
+                        region_temp = region.copy()
+                        region_temp['tags'] = region_temp['tags'][tag_id]
+                        added_regions.append(region_temp)
+            regions_temp = []
+            for region_id, region in enumerate(regions):
+                if region_id in removed_region_id:
+                    continue
+                regions_temp.append(region)
+            assets[asset_id]['regions'] = regions_temp + added_regions
 print('Removed frames:', len(removed_asset_id))
 
 desired_frames = []
