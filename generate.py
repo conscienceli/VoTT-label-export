@@ -33,8 +33,10 @@ with open(input_path, 'r', encoding='utf-8') as f:
 
 tags = sorted(json_file['tags'],key=utils.sort_tag)
 print('Label catagories:', len(tags))
-print([elem['name'] for elem in tags])
-print(json_file['tags'])
+tag_names = [elem['name'] for elem in tags]
+print(tag_names)
+tag_counts = [0 for t in tag_names]
+#print(json_file['tags'])
 
 tags_color = {}
 for tag in tags:
@@ -75,7 +77,7 @@ for asset_id in assets.keys():
                     removed_region_id.append(region_id)
                     for tag_id in range(0, len(region['tags'])):
                         region_temp = region.copy()
-                        region_temp['tags'] = region_temp['tags'][tag_id]
+                        region_temp['tags'] = [region_temp['tags'][tag_id]]
                         added_regions.append(region_temp)
             regions_temp = []
             for region_id, region in enumerate(regions):
@@ -83,6 +85,9 @@ for asset_id in assets.keys():
                     continue
                 regions_temp.append(region)
             assets[asset_id]['regions'] = regions_temp + added_regions
+            for region_id, region in enumerate(assets[asset_id]['regions']):
+                tag_counts[tag_names.index(region['tags'][0])] += 1
+
 print('Removed frames:', len(removed_asset_id))
 
 desired_frames = []
@@ -99,8 +104,13 @@ if False:
     video = mpy.VideoFileClip('./000001.mov')
     find_nearest_frames(video, desired_frames)
 
-print('\nDesired frames: ', len(desired_frames))
+print('Desired frames: ', len(desired_frames))
 # print(desired_frames)
+print('\nTotal tags', sum(tag_counts))
+for tag_id, tag_name in enumerate(tag_names):
+    print(f'------{tag_name}: {tag_counts[tag_id]}')
+
+print('\n')
 
 os.makedirs(f'{output_path}vis', exist_ok=True)
 os.makedirs(f'{output_path}vis_with_raw', exist_ok=True)
