@@ -6,24 +6,22 @@ def find_inner_point(image, raw_image=None):
     image = np.array(image)
     if raw_image:
         raw_image = np.array(raw_image)
+
     for row_id, row in enumerate(image):
-        edge_point_count = 0
         for col_id, element in enumerate(row):
             if element and not image[row_id][col_id-1]:
-                edge_point_count += 1
-                final_col_edge = col_id
-                if edge_point_count == 2 and not raw_image is None:
-                    break
-        if edge_point_count > 0 and edge_point_count % 2 == 0:
-            if (not raw_image is None):
-                edge_points_raw = np.array([col_id-1 for col_id in range(len(raw_image[row_id])) if (raw_image[row_id, col_id] and not raw_image[row_id, col_id-1])])
-                # print(len(edge_points_raw), sum(edge_points_raw < final_col_edge-1), sum(edge_points_raw > final_col_edge-1))
-                if not len(edge_points_raw) % 2 == 0 \
-                or sum(edge_points_raw < final_col_edge-1) % 2 == 0:
-                    continue
-            return (final_col_edge-1, row_id)
-
+                if is_inside_image(image, row_id, col_id-1):
+                    return (col_id-1, row_id)
     return None
+
+def is_inside_image(image, row_id, col_id):
+    dir_num = sum([1 for i in range(col_id) if image[row_id, i] and (i==0 or not image[row_id, i-1])])
+    if dir_num == 0 or dir_num % 2 == 0:
+        return False
+    dir_num = sum([1 for i in range(row_id) if image[i, col_id] and (i==0 or not image[i-1, col_id])])
+    if dir_num == 0 or dir_num % 2 == 0:
+        return False
+    return True
 
 # def is_point_surrounded(image, point):
 #     image = np.array(image)
@@ -91,7 +89,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         return
 
     # For debug
-    # if asset['name'].find('156.5') < 0:
+    # if asset['name'].find('575.5') < 0:
     #     return
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
@@ -107,7 +105,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
                 continue
 
             # For debug
-            # if not region['tags'][0] == 'CCC_Forceps':
+            # if not region['tags'][0] == 'IA':
             #     continue
 
             flood_region = np.zeros((asset['size']['height'], asset['size']['width']), dtype=np.uint8)
