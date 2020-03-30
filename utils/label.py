@@ -2,21 +2,44 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageColor
 import pickle
 
-def find_inner_point(image):
+def find_inner_point(image, raw_image=None):
     image = np.array(image)
+    if raw_image:
+        raw_image = np.array(raw_image)
     for row_id, row in enumerate(image):
         edge_point_count = 0
         for col_id, element in enumerate(row):
             if element and not image[row_id][col_id-1]:
                 edge_point_count += 1
-                if edge_point_count == 2:
-                    return (col_id-1, row_id)
-                elif edge_point_count > 2:
+                final_col_edge = col_id
+                if edge_point_count == 2 and not raw_image is None:
                     break
-            elif element and edge_point_count:
-                break
+        if edge_point_count > 0 and edge_point_count % 2 == 0:
+            if (not raw_image is None):
+                edge_points_raw = np.array([col_id-1 for col_id in range(len(raw_image[row_id])) if (raw_image[row_id, col_id] and not raw_image[row_id, col_id-1])])
+                # print(len(edge_points_raw), sum(edge_points_raw < final_col_edge-1), sum(edge_points_raw > final_col_edge-1))
+                if not len(edge_points_raw) % 2 == 0 \
+                or sum(edge_points_raw < final_col_edge-1) % 2 == 0:
+                    continue
+            return (final_col_edge-1, row_id)
+
     return None
 
+# def is_point_surrounded(image, point):
+#     image = np.array(image)
+#     col_id, row_id = point
+#     print('ksfj: ', point)
+#     print(col_id == 0 or image[row_id][col_id-1])
+#     print(col_id == image.shape[1]-1 or image[row_id][col_id+1])
+#     print(row_id == 0 or image[row_id-1][col_id])
+#     print(row_id == image.shape[0]-1 or image[row_id+1][col_id])
+#     if  (col_id == 0 or image[row_id][col_id-1]) \
+#         and (col_id == image.shape[1]-1 or image[row_id][col_id+1]) \
+#         and (row_id == 0 or image[row_id-1][col_id]) \
+#         and (row_id == image.shape[0]-1 or image[row_id+1][col_id]):
+#         return True
+#     else:
+#         return False
 
 def draw_with_mask(image, mask, color):
     image = np.array(image, dtype=np.uint8)
@@ -68,7 +91,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         return
 
     # For debug
-    # if asset['name'].find('575.5') < 0:
+    # if asset['name'].find('156.5') < 0:
     #     return
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
@@ -82,6 +105,11 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         for region in regions:
             if not region['tags'][0] == tag['name']:
                 continue
+
+            # For debug
+            # if not region['tags'][0] == 'CCC_Forceps':
+            #     continue
+
             flood_region = np.zeros((asset['size']['height'], asset['size']['width']), dtype=np.uint8)
             flood_region = Image.fromarray(flood_region, '1')
             draw = ImageDraw.Draw(flood_region)
@@ -93,9 +121,27 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
             draw.line((pre_point['x'], pre_point['y'], curr_point['x'], curr_point['y']), fill=1)
             del draw
             inner_point = find_inner_point(flood_region)
+            flood_region_raw = flood_region.copy()
+            # For debug
+            # draw.line((curr_point['x'], curr_point['y'], inner_point[0], inner_point[1]), fill=1)
+            # ImageDraw.floodfill(flood_region, xy=inner_point, value=1)
+
             while inner_point:
+                # For debug
+                # if is_point_surrounded(flood_region, inner_point):
+                #     flood_region[inner_point[1], inner_point[0]] = 1
+                # else:
+                #     ImageDraw.floodfill(flood_region, xy=inner_point, value=1)
+                # flood_region = np.array(flood_region)
+                # flood_region[454, 1279:1500] = 1
+
                 ImageDraw.floodfill(flood_region, xy=inner_point, value=1)
-                inner_point = find_inner_point(flood_region)
+                inner_point = find_inner_point(flood_region, flood_region_raw)
+
+                # For debug
+                # flood_region = np.array(flood_region)
+                # flood_region[inner_point[1], inner_point[0]:inner_point[0]+50] = 1
+                # break
             
             region_color = ImageColor.getrgb(tags_color[region['tags'][0]])
             
