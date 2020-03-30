@@ -6,11 +6,13 @@ def find_inner_point(image, raw_image=None):
     image = np.array(image)
     if raw_image:
         raw_image = np.array(raw_image)
+    else:
+        raw_image = image
 
     for row_id, row in enumerate(image):
         for col_id, element in enumerate(row):
             if element and not image[row_id][col_id-1]:
-                if is_inside_image(image, row_id, col_id-1):
+                if is_inside_image(raw_image, row_id, col_id-1):
                     return (col_id-1, row_id)
     return None
 
@@ -89,7 +91,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         return
 
     # For debug
-    # if asset['name'].find('575.5') < 0:
+    # if asset['name'].find('474') < 0:
     #     return
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
@@ -105,7 +107,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
                 continue
 
             # For debug
-            # if not region['tags'][0] == 'IA':
+            # if not region['tags'][0] == 'Field':
             #     continue
 
             flood_region = np.zeros((asset['size']['height'], asset['size']['width']), dtype=np.uint8)
