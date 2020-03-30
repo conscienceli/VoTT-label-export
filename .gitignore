@@ -127,3 +127,5 @@ dmypy.json
 
 # Custom
 results/
+data/
+settings.json

@@ -13,6 +13,7 @@ des_text = 'Please use -i to specify the json file and -o to specify the output 
 parser = argparse.ArgumentParser(description=des_text)
 parser.add_argument('--input', '-i', help="(Required) Path of VoTT JSON file")
 parser.add_argument('--output', '-o', help="(Optional) Path of output files")
+parser.add_argument('--tags', '-t', help="(Optional) Path of file for desired tag colors and order")
 args = parser.parse_args()
 
 if not args.input:
@@ -31,16 +32,30 @@ else:
 with open(input_path, 'r', encoding='utf-8') as f:
     json_file = json.load(f)
 
-tags = sorted(json_file['tags'],key=utils.sort_tag)
-print('Label catagories:', len(tags))
+tags = sorted(json_file['tags'], key=utils.sort_tag)
 tag_names = [elem['name'] for elem in tags]
-print(tag_names)
+
+if args.tags:
+    with open(args.tags, 'r', encoding='utf-8') as f:
+        json_file_selected = json.load(f)
+    tags_selected = json_file_selected['tags']
+    tag_names_selected = [elem['name'] for elem in tags_selected]
+    # print('Label catagories (selected):', len(tag_names_selected))
+    # print(tag_names_selected)
+    for tag_name in tag_names:
+        assert(tag_name in tag_names_selected)
+    tags = tags_selected
+    tag_names = tag_names_selected
+
 tag_counts = [0 for t in tag_names]
-#print(json_file['tags'])
+print('Label catagories:', len(tags))
+print(tag_names)
+
 
 tags_color = {}
 for tag in tags:
     tags_color.update({tag['name']: tag['color']})
+
 assets = json_file['assets']
 
 print('\nTotal frames:', len(assets.keys()))
