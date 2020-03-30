@@ -28,7 +28,9 @@ def draw_with_mask(image, mask, color):
             if color[-1] == 255:
                 image[row_id, col_id] = color
             else:
-                image[row_id, col_id] = (image[row_id, col_id] + color) / 2
+                color_sum = float(color[3]) + 255.
+                image[row_id, col_id, :3] = (image[row_id, col_id, :3].astype(np.float)*255./color_sum + [float(i)*float(color[3])/color_sum for i in color[:3]]).astype(np.uint8)
+                image[row_id, col_id, 3] = 255
     return image
 
 
@@ -74,7 +76,8 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     labeled_image = standard_labeled_tensor(asset['size']['height'], asset['size']['width'], len(tags)+1)
     labeled_image_vis = standard_alpha_image(asset['size']['height'], asset['size']['width'])
     labeled_image_vis_with_raw = Image.open(raw_img_path).convert('RGBA')
-    
+    labeled_image_vis_with_raw.save(f"{output_path}raw/{asset['name']}.png")
+
     for tag in tags:
         for region in regions:
             if not region['tags'][0] == tag['name']:
@@ -98,7 +101,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
             
             labeled_image_vis = draw_with_mask(labeled_image_vis, flood_region, (region_color[0],region_color[1],region_color[2],255))
             labeled_image_vis = Image.fromarray(labeled_image_vis, 'RGBA')
-            labeled_image_vis_with_raw = draw_with_mask(labeled_image_vis_with_raw, flood_region, (region_color[0],region_color[1],region_color[2],200))
+            labeled_image_vis_with_raw = draw_with_mask(labeled_image_vis_with_raw, flood_region, (region_color[0],region_color[1],region_color[2],150))
             labeled_image_vis_with_raw = Image.fromarray(labeled_image_vis_with_raw, 'RGBA')
     
     labeled_image_vis.save(f"{output_path}vis/{asset['name']}.png")

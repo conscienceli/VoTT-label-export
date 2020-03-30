@@ -43,6 +43,7 @@ if args.tags:
     # print('Label catagories (selected):', len(tag_names_selected))
     # print(tag_names_selected)
     for tag_name in tag_names:
+        # print(tag_name)
         assert(tag_name in tag_names_selected)
     tags = tags_selected
     tag_names = tag_names_selected
@@ -130,6 +131,7 @@ print('\n')
 os.makedirs(f'{output_path}vis', exist_ok=True)
 os.makedirs(f'{output_path}vis_with_raw', exist_ok=True)
 os.makedirs(f'{output_path}tensors', exist_ok=True)
+os.makedirs(f'{output_path}raw', exist_ok=True)
 Parallel(n_jobs=8)(delayed(utils.generate_labels)\
                 (assets[asset_id], input_path, output_path, desired_frames, tags, tags_color)\
                  for asset_id in tqdm(assets.keys()))
