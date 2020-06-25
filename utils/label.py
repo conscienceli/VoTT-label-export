@@ -67,7 +67,6 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     labeled_image_grey = np.ones((asset['size']['height'], asset['size']['width']), dtype=np.uint8) * 255
     labeled_image_vis = standard_alpha_image(asset['size']['height'], asset['size']['width'])
     labeled_image_vis_with_raw = Image.open(raw_img_path).convert('RGBA')
-    labeled_image_vis_with_raw.save(f"{output_path}raw/{asset['name']}.png")
 
     for tag in tags:
         for region in regions:
@@ -120,7 +119,8 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     labeled_image_grey = Image.fromarray(labeled_image_grey, 'L')
     labeled_image_vis = Image.fromarray(labeled_image_vis, 'RGBA')
     labeled_image_vis_with_raw = Image.fromarray(labeled_image_vis_with_raw, 'RGBA')
-    
+
+    labeled_image_vis_with_raw.save(f"{output_path}raw/{asset['name']}.jpg")
     labeled_image_grey.save(f"{output_path}labels/{asset['name']}.png")
     labeled_image_vis.save(f"{output_path}vis/{asset['name']}.png")
     labeled_image_vis_with_raw.convert('RGB').save(f"{output_path}vis_with_raw/{asset['name']}.jpg")
