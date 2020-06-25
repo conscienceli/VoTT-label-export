@@ -151,12 +151,12 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
             labeled_image_vis_with_raw = Image.fromarray(labeled_image_vis_with_raw, 'RGBA')
     
     labeled_image_vis.save(f"{output_path}vis/{asset['name']}.png")
-    labeled_image_vis_with_raw.save(f"{output_path}vis_with_raw/{asset['name']}.jpg")
+    labeled_image_vis_with_raw.convert('RGB').save(f"{output_path}vis_with_raw/{asset['name']}.jpg")
    
     labeled_image_temp = standard_labeled_tensor(asset['size']['height'], asset['size']['width'], len(tags)+1)
     for i in range(labeled_image.shape[-1]):
         labeled_image_temp[:,:,i] = np.array(Image.fromarray(labeled_image[:,:,i]*255,'L').resize((asset['size']['width'], asset['size']['height'])), dtype=np.uint8)/255
     labeled_image = labeled_image_temp
         
-    with open(f"{output_path}tensors/{asset['name']}.pickle", 'wb') as pickle_file:
-        pickle.dump(labeled_image, pickle_file)
+    # with open(f"{output_path}tensors/{asset['name']}.pickle", 'wb') as pickle_file:
+    #     pickle.dump(labeled_image, pickle_file)
