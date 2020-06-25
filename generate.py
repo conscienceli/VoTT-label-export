@@ -38,7 +38,7 @@ tag_names = [elem['name'] for elem in tags]
 if args.tags:
     with open(args.tags, 'r', encoding='utf-8') as f:
         json_file_selected = json.load(f)
-    tags_selected = json_file_selected['tags']
+    tags_selected = sorted(json_file_selected['tags'], key=utils.sort_tag)
     tag_names_selected = [elem['name'] for elem in tags_selected]
     # print('Label catagories (selected):', len(tag_names_selected))
     # print(tag_names_selected)
@@ -130,8 +130,9 @@ print('\n')
 
 os.makedirs(f'{output_path}vis', exist_ok=True)
 os.makedirs(f'{output_path}vis_with_raw', exist_ok=True)
-os.makedirs(f'{output_path}tensors', exist_ok=True)
+# os.makedirs(f'{output_path}tensors', exist_ok=True)
 os.makedirs(f'{output_path}raw', exist_ok=True)
+os.makedirs(f'{output_path}labels', exist_ok=True)
 Parallel(n_jobs=8)(delayed(utils.generate_labels)\
-                (assets[asset_id], input_path, output_path, desired_frames, tags, tags_color)\
+                (assets[asset_id], input_path, output_path, desired_frames, tags, tags_color, tag_names)\
                  for asset_id in tqdm(assets.keys()))
