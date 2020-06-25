@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageColor
 import pickle
 
+
 def find_inner_point(image, raw_image=None):
     image = np.array(image)
     if raw_image:
@@ -16,6 +17,7 @@ def find_inner_point(image, raw_image=None):
                     return (col_id-1, row_id)
     return None
 
+
 def is_inside_image(image, row_id, col_id):
     dir_num = sum([1 for i in range(col_id) if image[row_id, i] and (i==0 or not image[row_id, i-1])])
     if dir_num == 0 or dir_num % 2 == 0:
@@ -25,21 +27,6 @@ def is_inside_image(image, row_id, col_id):
         return False
     return True
 
-# def is_point_surrounded(image, point):
-#     image = np.array(image)
-#     col_id, row_id = point
-#     print('ksfj: ', point)
-#     print(col_id == 0 or image[row_id][col_id-1])
-#     print(col_id == image.shape[1]-1 or image[row_id][col_id+1])
-#     print(row_id == 0 or image[row_id-1][col_id])
-#     print(row_id == image.shape[0]-1 or image[row_id+1][col_id])
-#     if  (col_id == 0 or image[row_id][col_id-1]) \
-#         and (col_id == image.shape[1]-1 or image[row_id][col_id+1]) \
-#         and (row_id == 0 or image[row_id-1][col_id]) \
-#         and (row_id == image.shape[0]-1 or image[row_id+1][col_id]):
-#         return True
-#     else:
-#         return False
 
 def draw_with_mask(image, mask, color):
     image = np.array(image, dtype=np.uint8)
@@ -57,31 +44,12 @@ def draw_with_mask(image, mask, color):
     return image
 
 
-# def draw_tensor_with_mask(tensor, mask, channel, new_value):
-#     tensor = np.array(tensor, dtype=np.uint8)
-#     mask = np.array(mask, dtype=np.uint8)
-#     for row_id, row in enumerate(mask):
-#         for col_id, element in enumerate(row):
-#             if not element:
-#                 continue
-#             tensor[row_id, col_id, channel] = new_value
-#     return tensor
-
-
 def standard_alpha_image(height, width):
     image = np.zeros((height, width, 4), dtype=np.uint8)
     for row_id, row in enumerate(image):
         for col_id, element in enumerate(row):
             image[row_id, col_id] = np.array((element[0],element[1],element[2],255))
-    return Image.fromarray(image, 'RGBA')
-
-
-# def standard_labeled_tensor(height, width, channel):
-#     tensor = np.zeros((height, width, channel), dtype=np.uint8)
-#     for row_id, row in enumerate(tensor):
-#         for col_id, element in enumerate(row):
-#             tensor[row_id, col_id, 0] = 1
-#     return tensor
+    return image
 
 
 def generate_labels(record, input_path, output_path, desired_frames, tags, tags_color, tag_names):
@@ -96,7 +64,6 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
 
-    # labeled_image = standard_labeled_tensor(asset['size']['height'], asset['size']['width'], len(tags)+1)
     labeled_image_grey = np.ones((asset['size']['height'], asset['size']['width']), dtype=np.uint8) * 255
     labeled_image_vis = standard_alpha_image(asset['size']['height'], asset['size']['width'])
     labeled_image_vis_with_raw = Image.open(raw_img_path).convert('RGBA')
@@ -153,14 +120,8 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     labeled_image_grey = Image.fromarray(labeled_image_grey, 'L')
     labeled_image_vis = Image.fromarray(labeled_image_vis, 'RGBA')
     labeled_image_vis_with_raw = Image.fromarray(labeled_image_vis_with_raw, 'RGBA')
+    
     labeled_image_grey.save(f"{output_path}labels/{asset['name']}.png")
     labeled_image_vis.save(f"{output_path}vis/{asset['name']}.png")
     labeled_image_vis_with_raw.convert('RGB').save(f"{output_path}vis_with_raw/{asset['name']}.jpg")
    
-    # labeled_image_temp = standard_labeled_tensor(asset['size']['height'], asset['size']['width'], len(tags)+1)
-    # for i in range(labeled_image.shape[-1]):
-    #     labeled_image_temp[:,:,i] = np.array(Image.fromarray(labeled_image[:,:,i]*255,'L').resize((asset['size']['width'], asset['size']['height'])), dtype=np.uint8)/255
-    # labeled_image = labeled_image_temp
-        
-    # with open(f"{output_path}tensors/{asset['name']}.pickle", 'wb') as pickle_file:
-    #     pickle.dump(labeled_image, pickle_file)
