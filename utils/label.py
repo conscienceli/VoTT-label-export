@@ -59,7 +59,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
         return
 
     # For debug
-    # if asset['name'].find('474') < 0:
+    # if asset['name'].find('000001.mp4#t=568.5') < 0:
     #     return
     
     raw_img_path = '/'.join(input_path.split('/')[:-1]) + '/' + asset['name']
@@ -68,6 +68,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
     labeled_image_vis = standard_alpha_image(asset['size']['height'], asset['size']['width'])
     labeled_image_vis_with_raw = Image.open(raw_img_path).convert('RGBA')
     labeled_image_vis_with_raw.convert('RGB').save(f"{output_path}raw/{asset['name']}")
+    labeled_image_vis_with_raw = np.array(labeled_image_vis_with_raw, dtype=np.uint8)
 
     for tag in tags:
         for region in regions:
@@ -110,7 +111,7 @@ def generate_labels(record, input_path, output_path, desired_frames, tags, tags_
                 # flood_region = np.array(flood_region)
                 # flood_region[inner_point[1], inner_point[0]:inner_point[0]+50] = 1
                 # break
-            
+
             region_color = ImageColor.getrgb(tags_color[region['tags'][0]])
             
             labeled_image_grey = draw_with_mask(labeled_image_grey, flood_region, tag_names.index(region['tags'][0]))
